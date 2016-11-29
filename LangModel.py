@@ -1,3 +1,13 @@
-Python 3.4.2 (v3.4.2:ab2c023a9432, Oct  6 2014, 22:15:05) [MSC v.1600 32 bit (Intel)] on win32
-Type "copyright", "credits" or "license()" for more information.
->>> 
+import re
+
+# used for unseen words in training vocabularies
+UNK = None
+# sentence start and end
+SENTENCE_START = "<s>"
+SENTENCE_END = "</s>"
+
+def read_sentences_from_file():
+    with open("./sampledata.txt", "r") as f:
+        print ([re.split("\s+", line.rstrip('\n')) for line in f])
+
+read_sentences_from_file()
