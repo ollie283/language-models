@@ -28,14 +28,20 @@ Again every space-separated token is a word. The above sentence has 9 tokens. Th
 
 ## Implementation of the models
 a) Write a function to compute unigram unsmoothed and smoothed models. Print out the unigram probabilities computed by each model for the **Toy dataset**.
+
 b) Write a function to compute bigram unsmoothed and smoothed models. Print out the bigram probabilities computed by each model for the **Toy dataset**.
+
 c) Write a function to compute sentence probabilities under a language model. Print out the probabilities of sentences in **Toy dataset** using the smoothed unigram and bigram models.
+
 d) Write a function to return the perplexity of a test corpus given a particular language model. Print out the perplexities computed for ```sampletest.txt``` using a smoothed unigram model and a smoothed bigram model.
 
 ## Run on large corpus 
 Now use the **Actual dataset**. Train smoothed unigram and bigram models on ```train.txt```. Print out the perplexity under each model for
+
 a) ```train.txt``` i.e. the same corpus you used to train the model.
+
 b) ```test.txt```
+
 c) Compare the perplexities computed for (a) and (b). Which one is higher and why? Explain in one or two sentences.
 
 ## Code
