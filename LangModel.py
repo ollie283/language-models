@@ -60,7 +60,9 @@ def print_unigram_probs(sorted_vocab_keys, model):
 
 if __name__ == '__main__':
     toy_dataset = read_sentences_from_file("./sampledata.txt")
+    
     toy_dataset_model_unsmoothed = UnigramLanguageModel(toy_dataset)
+    toy_dataset_model_smoothed = UnigramLanguageModel(toy_dataset, smoothing=True)
 
     sorted_vocab_keys = toy_dataset_model_unsmoothed.sorted_vocabulary()
 
@@ -68,3 +70,5 @@ if __name__ == '__main__':
     print("=== UNIGRAM MODEL ===")
     print("- Unsmoothed  -")
     print_unigram_probs(sorted_vocab_keys, toy_dataset_model_unsmoothed)
+    print("\n- Smoothed  -")
+    print_unigram_probs(sorted_vocab_keys, toy_dataset_model_smoothed)
