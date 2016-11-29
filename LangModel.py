@@ -77,7 +77,16 @@ class BigramLanguageModel(UnigramLanguageModel):
             bigram_word_probability_denominator += self.unique__bigram_words
         return 0.0 if bigram_word_probability_numerator == 0 or bigram_word_probability_denominator == 0 else float(
             bigram_word_probability_numerator) / float(bigram_word_probability_denominator)
-    
+
+    def calculate_number_of_bigrams(sentences):
+        bigram_count = 0
+        for sentence in sentences:
+            # remove one for number of bigrams in sentence
+            bigram_count += len(sentence) - 1
+        return bigram_count
+
+
+# print unigram and bigram probs
 def print_unigram_probs(sorted_vocab_keys, model):
     for vocab_key in sorted_vocab_keys:
         if vocab_key != SENTENCE_START and vocab_key != SENTENCE_END:
@@ -85,18 +94,27 @@ def print_unigram_probs(sorted_vocab_keys, model):
                                        model.calculate_unigram_probability(vocab_key)), end=" ")
     print("")
 
-def calculate_number_of_bigrams(sentences):
-    bigram_count = 0
-    for sentence in sentences:
-        # remove one for number of bigrams in sentence
-        bigram_count += len(sentence) - 1
-    return bigram_count
+def print_bigram_probs(sorted_vocab_keys, model):
+    print("\t\t", end="")
+    for vocab_key in sorted_vocab_keys:
+        if vocab_key != SENTENCE_START:
+            print(vocab_key if vocab_key != UNK else "UNK", end="\t\t")
+    print("")
+    for vocab_key in sorted_vocab_keys:
+        if vocab_key != SENTENCE_END:
+            print(vocab_key if vocab_key != UNK else "UNK", end="\t\t")
+            for vocab_key_second in sorted_vocab_keys:
+                if vocab_key_second != SENTENCE_START:
+                    print("{0:.5f}".format(model.calculate_bigram_probabilty(vocab_key, vocab_key_second)), end="\t\t")
+            print("")
+    print("")
+
 
 if __name__ == '__main__':
     toy_dataset = read_sentences_from_file("./sampledata.txt")
     
-    toy_dataset_model_unsmoothed = UnigramLanguageModel(toy_dataset)
-    toy_dataset_model_smoothed = UnigramLanguageModel(toy_dataset, smoothing=True)
+    toy_dataset_model_unsmoothed = BigramLanguageModel(toy_dataset)
+    toy_dataset_model_smoothed = BigramLanguageModel(toy_dataset, smoothing=True)
 
     sorted_vocab_keys = toy_dataset_model_unsmoothed.sorted_vocabulary()
 
@@ -109,3 +127,10 @@ if __name__ == '__main__':
 
     print("")
 
+    print("=== BIGRAM MODEL ===")
+    print("- Unsmoothed  -")
+    print_bigram_probs(sorted_vocab_keys, toy_dataset_model_unsmoothed)
+    print("- Smoothed  -")
+    print_bigram_probs(sorted_vocab_keys, toy_dataset_model_smoothed)
+
+    print("")
