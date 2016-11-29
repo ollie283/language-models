@@ -42,8 +42,6 @@ a) ```train.txt``` i.e. the same corpus you used to train the model.
 
 b) ```test.txt```
 
-c) Compare the perplexities computed for (a) and (b). Which one is higher and why? Explain in one or two sentences.
-
 ## Code
 Code should run without any arguments. It should read ﬁles in the same directory. Absolute paths must not be used. 
 It should print values in the following format:
