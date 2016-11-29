@@ -40,7 +40,7 @@ class UnigramLanguageModel:
                 # add one more to total number of seen unique words for UNK - unseen events
                 word_probability_denominator += self.unique_words + 1
             return float(word_probability_numerator) / float(word_probability_denominator)
-
+                
     def sorted_vocabulary(self):
         full_vocab = list(self.unigram_frequencies.keys())
         full_vocab.remove(SENTENCE_START)
@@ -50,6 +50,24 @@ class UnigramLanguageModel:
         full_vocab.append(SENTENCE_START)
         full_vocab.append(SENTENCE_END)
         return full_vocab
+
+class BigramLanguageModel(UnigramLanguageModel):
+    def __init__(self, sentences, smoothing=False):
+        UnigramLanguageModel.__init__(self, sentences, smoothing)
+        self.bigram_frequencies = dict()
+        self.unique_bigrams = set()
+        for sentence in sentences:
+            previous_word = None
+            for word in sentence:
+                if previous_word != None:
+                    self.bigram_frequencies[(previous_word, word)] = self.bigram_frequencies.get((previous_word, word),
+                                                                                                 0) + 1
+                    if previous_word != SENTENCE_START and word != SENTENCE_END:
+                        self.unique_bigrams.add((previous_word, word))
+                previous_word = word
+        # we subtracted two for the Unigram model as the unigram_frequencies dictionary
+        # contains values for SENTENCE_START and SENTENCE_END but these need to be included in Bigram
+        self.unique__bigram_words = len(self.unigram_frequencies)
 
 def print_unigram_probs(sorted_vocab_keys, model):
     for vocab_key in sorted_vocab_keys:
@@ -72,3 +90,6 @@ if __name__ == '__main__':
     print_unigram_probs(sorted_vocab_keys, toy_dataset_model_unsmoothed)
     print("\n- Smoothed  -")
     print_unigram_probs(sorted_vocab_keys, toy_dataset_model_smoothed)
+
+    print("")
+
