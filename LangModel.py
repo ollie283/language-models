@@ -69,12 +69,28 @@ class BigramLanguageModel(UnigramLanguageModel):
         # contains values for SENTENCE_START and SENTENCE_END but these need to be included in Bigram
         self.unique__bigram_words = len(self.unigram_frequencies)
 
+    def calculate_bigram_probabilty(self, previous_word, word):
+        bigram_word_probability_numerator = self.bigram_frequencies.get((previous_word, word), 0)
+        bigram_word_probability_denominator = self.unigram_frequencies.get(previous_word, 0)
+        if self.smoothing:
+            bigram_word_probability_numerator += 1
+            bigram_word_probability_denominator += self.unique__bigram_words
+        return 0.0 if bigram_word_probability_numerator == 0 or bigram_word_probability_denominator == 0 else float(
+            bigram_word_probability_numerator) / float(bigram_word_probability_denominator)
+    
 def print_unigram_probs(sorted_vocab_keys, model):
     for vocab_key in sorted_vocab_keys:
         if vocab_key != SENTENCE_START and vocab_key != SENTENCE_END:
             print("{}: {}".format(vocab_key if vocab_key != UNK else "UNK",
                                        model.calculate_unigram_probability(vocab_key)), end=" ")
     print("")
+
+def calculate_number_of_bigrams(sentences):
+    bigram_count = 0
+    for sentence in sentences:
+        # remove one for number of bigrams in sentence
+        bigram_count += len(sentence) - 1
+    return bigram_count
 
 if __name__ == '__main__':
     toy_dataset = read_sentences_from_file("./sampledata.txt")
