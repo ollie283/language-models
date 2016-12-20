@@ -78,6 +78,13 @@ class BigramLanguageModel(UnigramLanguageModel):
         # contains values for SENTENCE_START and SENTENCE_END but these need to be included in Bigram
         self.unique__bigram_words = len(self.unigram_frequencies)
 
+    def calculate_number_of_bigrams(sentences):
+        bigram_count = 0
+        for sentence in sentences:
+            # remove one for number of bigrams in sentence
+            bigram_count += len(sentence) - 1
+        return bigram_count
+
     def calculate_bigram_probabilty(self, previous_word, word):
         bigram_word_probability_numerator = self.bigram_frequencies.get((previous_word, word), 0)
         bigram_word_probability_denominator = self.unigram_frequencies.get(previous_word, 0)
@@ -87,12 +94,16 @@ class BigramLanguageModel(UnigramLanguageModel):
         return 0.0 if bigram_word_probability_numerator == 0 or bigram_word_probability_denominator == 0 else float(
             bigram_word_probability_numerator) / float(bigram_word_probability_denominator)
 
-    def calculate_number_of_bigrams(sentences):
-        bigram_count = 0
-        for sentence in sentences:
-            # remove one for number of bigrams in sentence
-            bigram_count += len(sentence) - 1
-        return bigram_count
+    def calculate_bigram_sentence_probability(self, sentence, normalize_probability=True):
+        bigram_sentence_probability_log_sum = 0
+        previous_word = None
+        for word in sentence:
+            if previous_word != None:
+                bigram_word_probability = self.calculate_bigram_probabilty(previous_word, word)
+                bigram_sentence_probability_log_sum += math.log(bigram_word_probability, 2)
+            previous_word = word
+        return math.pow(2,
+                        bigram_sentence_probability_log_sum) if normalize_probability else bigram_sentence_probability_log_sum
 
 # print unigram and bigram probs
 def print_unigram_probs(sorted_vocab_keys, model):
@@ -146,10 +157,10 @@ if __name__ == '__main__':
 
     print("== SENTENCE PROBABILITIES == ")
     longest_sentence_len = max([len(" ".join(sentence)) for sentence in toy_dataset_test]) + 5
-    print("sent", " " * (longest_sentence_len - len("sent") - 2), "uprob")
+    print("sent", " " * (longest_sentence_len - len("sent") - 2), "uprob\t\tbiprob")
     for sentence in toy_dataset_test:
         sentence_string = " ".join(sentence)
         print(sentence_string, end=" " * (longest_sentence_len - len(sentence_string)))
-        print("{0:.5f}".format(toy_dataset_model_smoothed.calculate_sentence_probability(sentence)), end="")
-        print("")
+        print("{0:.5f}".format(toy_dataset_model_smoothed.calculate_sentence_probability(sentence)), end="\t\t")
+        print("{0:.5f}".format(toy_dataset_model_smoothed.calculate_bigram_sentence_probability(sentence)))        
         
