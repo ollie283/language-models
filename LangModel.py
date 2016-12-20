@@ -1,4 +1,5 @@
 import re
+import math
 
 # used for unseen words in training vocabularies
 UNK = None
@@ -93,7 +94,6 @@ class BigramLanguageModel(UnigramLanguageModel):
             bigram_count += len(sentence) - 1
         return bigram_count
 
-
 # print unigram and bigram probs
 def print_unigram_probs(sorted_vocab_keys, model):
     for vocab_key in sorted_vocab_keys:
@@ -120,6 +120,7 @@ def print_bigram_probs(sorted_vocab_keys, model):
 
 if __name__ == '__main__':
     toy_dataset = read_sentences_from_file("./sampledata.txt")
+    toy_dataset_test = read_sentences_from_file("./sampletest.txt")
     
     toy_dataset_model_unsmoothed = BigramLanguageModel(toy_dataset)
     toy_dataset_model_smoothed = BigramLanguageModel(toy_dataset, smoothing=True)
@@ -142,3 +143,13 @@ if __name__ == '__main__':
     print_bigram_probs(sorted_vocab_keys, toy_dataset_model_smoothed)
 
     print("")
+
+    print("== SENTENCE PROBABILITIES == ")
+    longest_sentence_len = max([len(" ".join(sentence)) for sentence in toy_dataset_test]) + 5
+    print("sent", " " * (longest_sentence_len - len("sent") - 2), "uprob")
+    for sentence in toy_dataset_test:
+        sentence_string = " ".join(sentence)
+        print(sentence_string, end=" " * (longest_sentence_len - len(sentence_string)))
+        print("{0:.5f}".format(toy_dataset_model_smoothed.calculate_sentence_probability(sentence)), end="")
+        print("")
+        
