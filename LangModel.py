@@ -203,3 +203,4 @@ if __name__ == '__main__':
 
     print("PERPLEXITY of test.txt")
     print("unigram: ", calculate_unigram_perplexity(actual_dataset_model_smoothed, actual_dataset_test))
+    print("bigram: ", calculate_bigram_perplexity(actual_dataset_model_smoothed, actual_dataset_test))
