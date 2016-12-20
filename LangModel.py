@@ -40,7 +40,15 @@ class UnigramLanguageModel:
                 # add one more to total number of seen unique words for UNK - unseen events
                 word_probability_denominator += self.unique_words + 1
             return float(word_probability_numerator) / float(word_probability_denominator)
-                
+
+    def calculate_sentence_probability(self, sentence, normalize_probability=True):
+        sentence_probability_log_sum = 0
+        for word in sentence:
+            if word != SENTENCE_START and word != SENTENCE_END:
+                word_probability = self.calculate_unigram_probability(word)
+                sentence_probability_log_sum += math.log(word_probability, 2)
+        return math.pow(2, sentence_probability_log_sum) if normalize_probability else sentence_probability_log_sum                
+
     def sorted_vocabulary(self):
         full_vocab = list(self.unigram_frequencies.keys())
         full_vocab.remove(SENTENCE_START)
