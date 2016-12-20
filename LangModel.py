@@ -188,3 +188,12 @@ if __name__ == '__main__':
     print("== TEST PERPLEXITY == ")
     print("unigram: ", calculate_unigram_perplexity(toy_dataset_model_smoothed, toy_dataset_test))
     print("bigram: ", calculate_bigram_perplexity(toy_dataset_model_smoothed, toy_dataset_test))
+    
+    print("")
+
+    actual_dataset = read_sentences_from_file("./train.txt")
+    actual_dataset_test = read_sentences_from_file("./test.txt")
+    actual_dataset_model_smoothed = BigramLanguageModel(actual_dataset, smoothing=True)
+    print("---------------- Actual dataset ----------------\n")
+    print("PERPLEXITY of train.txt")
+    print("unigram: ", calculate_unigram_perplexity(actual_dataset_model_smoothed, actual_dataset))
