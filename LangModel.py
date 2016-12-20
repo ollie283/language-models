@@ -11,8 +11,6 @@ def read_sentences_from_file(file_path):
     with open(file_path, "r") as f:
         return [re.split("\s+", line.rstrip('\n')) for line in f]
 
-
-    
 class UnigramLanguageModel:
     def __init__(self, sentences, smoothing=False):
         self.unigram_frequencies = dict()
@@ -25,13 +23,6 @@ class UnigramLanguageModel:
         # subtract 2 because unigram_frequencies dictionary contains values for SENTENCE_START and SENTENCE_END
         self.unique_words = len(self.unigram_frequencies) - 2
         self.smoothing = smoothing
-      
-    def calculate_number_of_unigrams(sentences):
-        unigram_count = 0
-        for sentence in sentences:
-            # remove two for <s> and </s>
-            unigram_count += len(sentence) - 2
-        return unigram_count
 
     def calculate_unigram_probability(self, word):
             word_probability_numerator = self.unigram_frequencies.get(word, 0)
@@ -78,13 +69,6 @@ class BigramLanguageModel(UnigramLanguageModel):
         # contains values for SENTENCE_START and SENTENCE_END but these need to be included in Bigram
         self.unique__bigram_words = len(self.unigram_frequencies)
 
-    def calculate_number_of_bigrams(sentences):
-        bigram_count = 0
-        for sentence in sentences:
-            # remove one for number of bigrams in sentence
-            bigram_count += len(sentence) - 1
-        return bigram_count
-
     def calculate_bigram_probabilty(self, previous_word, word):
         bigram_word_probability_numerator = self.bigram_frequencies.get((previous_word, word), 0)
         bigram_word_probability_denominator = self.unigram_frequencies.get(previous_word, 0)
@@ -104,6 +88,21 @@ class BigramLanguageModel(UnigramLanguageModel):
             previous_word = word
         return math.pow(2,
                         bigram_sentence_probability_log_sum) if normalize_probability else bigram_sentence_probability_log_sum
+
+# calculate number of unigrams & bigrams
+def calculate_number_of_unigrams(sentences):
+    unigram_count = 0
+    for sentence in sentences:
+        # remove two for <s> and </s>
+        unigram_count += len(sentence) - 2
+    return unigram_count
+
+def calculate_number_of_bigrams(sentences):
+        bigram_count = 0
+        for sentence in sentences:
+            # remove one for number of bigrams in sentence
+            bigram_count += len(sentence) - 1
+        return bigram_count
 
 # print unigram and bigram probs
 def print_unigram_probs(sorted_vocab_keys, model):
@@ -128,6 +127,16 @@ def print_bigram_probs(sorted_vocab_keys, model):
             print("")
     print("")
 
+# calculate perplexty
+def calculate_unigram_perplexity(model, sentences):
+    unigram_count = calculate_number_of_unigrams(sentences)
+    sentence_probability_log_sum = 0
+    for sentence in sentences:
+        try:
+            sentence_probability_log_sum -= math.log(model.calculate_sentence_probability(sentence), 2)
+        except:
+            sentence_probability_log_sum -= float('-inf')
+    return math.pow(2, sentence_probability_log_sum / unigram_count)
 
 if __name__ == '__main__':
     toy_dataset = read_sentences_from_file("./sampledata.txt")
@@ -164,3 +173,7 @@ if __name__ == '__main__':
         print("{0:.5f}".format(toy_dataset_model_smoothed.calculate_sentence_probability(sentence)), end="\t\t")
         print("{0:.5f}".format(toy_dataset_model_smoothed.calculate_bigram_sentence_probability(sentence)))        
         
+    print("")
+
+    print("== TEST PERPLEXITY == ")
+    print("unigram: ", calculate_unigram_perplexity(toy_dataset_model_smoothed, toy_dataset_test))
