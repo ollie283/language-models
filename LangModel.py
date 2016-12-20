@@ -138,6 +138,16 @@ def calculate_unigram_perplexity(model, sentences):
             sentence_probability_log_sum -= float('-inf')
     return math.pow(2, sentence_probability_log_sum / unigram_count)
 
+def calculate_bigram_perplexity(model, sentences):
+    number_of_bigrams = calculate_number_of_bigrams(sentences)
+    bigram_sentence_probability_log_sum = 0
+    for sentence in sentences:
+        try:
+            bigram_sentence_probability_log_sum -= math.log(model.calculate_bigram_sentence_probability(sentence), 2)
+        except:
+            bigram_sentence_probability_log_sum -= float('-inf')
+    return math.pow(2, bigram_sentence_probability_log_sum / number_of_bigrams)
+
 if __name__ == '__main__':
     toy_dataset = read_sentences_from_file("./sampledata.txt")
     toy_dataset_test = read_sentences_from_file("./sampletest.txt")
@@ -177,3 +187,4 @@ if __name__ == '__main__':
 
     print("== TEST PERPLEXITY == ")
     print("unigram: ", calculate_unigram_perplexity(toy_dataset_model_smoothed, toy_dataset_test))
+    print("bigram: ", calculate_bigram_perplexity(toy_dataset_model_smoothed, toy_dataset_test))
